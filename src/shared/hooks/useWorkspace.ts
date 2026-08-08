@@ -1,0 +1,62 @@
+// NexoCore — useWorkspace hook
+// Context del workspace activo, con plantilla cargada
+
+"use client";
+
+import { createContext, useContext, useMemo, type ReactNode } from "react";
+import type { NicheTemplate } from "@/modules/templates/template.types";
+import { TemplateFactory } from "@/modules/templates/templates";
+import type { Industry } from "@/modules/templates/template.types";
+
+interface WorkspaceContextValue {
+  tenantId: string | null;
+  tenantSlug: string | null;
+  industry: Industry | null;
+  template: NicheTemplate | null;
+}
+
+const WorkspaceContext = createContext<WorkspaceContextValue>({
+  tenantId: null,
+  tenantSlug: null,
+  industry: null,
+  template: null,
+});
+
+interface WorkspaceProviderProps {
+  children: ReactNode;
+  tenantId?: string;
+  tenantSlug?: string;
+  industry?: Industry;
+}
+
+export function WorkspaceProvider({
+  children,
+  tenantId,
+  tenantSlug,
+  industry,
+}: WorkspaceProviderProps) {
+  const value = useMemo<WorkspaceContextValue>(() => {
+    const template = industry ? TemplateFactory.create(industry) : null;
+    return {
+      tenantId: tenantId ?? null,
+      tenantSlug: tenantSlug ?? null,
+      industry: industry ?? null,
+      template,
+    };
+  }, [tenantId, tenantSlug, industry]);
+
+  return (
+    <WorkspaceContext.Provider value={value}>
+      {children}
+    </WorkspaceContext.Provider>
+  );
+}
+
+export function useWorkspace() {
+  return useContext(WorkspaceContext);
+}
+
+export function useTemplate() {
+  const ctx = useContext(WorkspaceContext);
+  return ctx.template;
+}
