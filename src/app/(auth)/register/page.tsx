@@ -3,14 +3,15 @@
 import { TemplateFactory } from "@/modules/templates/templates";
 import Link from "next/link";
 
-export default function RegisterPage({
+export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: { template?: string };
+  searchParams: Promise<{ template?: string }>;
 }) {
+  const sp = await searchParams;
   const industries = TemplateFactory.getIndustries();
-  const selectedTemplate = searchParams.template
-    ? TemplateFactory.getById(searchParams.template)
+  const selectedTemplate = sp.template
+    ? TemplateFactory.getById(sp.template)
     : null;
 
   return (

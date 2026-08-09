@@ -137,6 +137,8 @@ model Workspace {
   purchaseOrders  PurchaseOrder[]
   contacts        Contact[]
   deals           Deal[]
+  pipelineStages  PipelineStage[]
+  activities      Activity[]
   invoices        Invoice[]
   payments        Payment[]
   movements       InventoryMovement[]
@@ -390,6 +392,25 @@ model Activity {
   deal          Deal?     @relation(fields: [dealId], references: [id])
 
   @@index([tenantId, scheduledAt])
+}
+
+model PipelineStage {
+  id          String    @id @default(cuid())
+  tenantId    String
+  name        String
+  position    Int       @default(0)
+  color       String    @default("slate")
+  probability Int       @default(0)
+  isWon       Boolean   @default(false)
+  isLost      Boolean   @default(false)
+  isClosed    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  workspace   Workspace @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, position])
+  @@index([tenantId])
 }
 
 // ============================================================================
