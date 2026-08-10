@@ -69,6 +69,36 @@ Un entregable está Done si TODAS estas son verdaderas y verificables con un com
 
 El DoD es un ESTADO, no una opinión. Si no puedes demostrarlo con un comando, no está Done.
 
+
+## MCP Tools — MANDATORY for this project
+
+| Task | Tool | NEVER use |
+|------|------|-----------|
+| Understand schema | `mcp__lsp_intelligence__document_symbols on schema.prisma` | cat |
+| Verify type safety | `mcp__lsp_intelligence__live_diagnostics` | tsc --noEmit |
+| Edit TSX/TS files | `mcp__zenith__edit_file or write_file` | sed |
+| Search across codebase | `mcp__zenith__search_files` | grep, rg |
+| Commit to GitHub | `mcp__github__push_files` | git commit + git push |
+| Code review | `mcp__mcp_code_review_pro__review_diff` | manual inspection only |
+| Prisma validate | `npx prisma validate (terminal)` | manual schema check |
+| Visual QA | `mcp__playwright__browser_take_screenshot + browser_snapshot` | guessing UI |
+
+## Test Strategy
+- Playwright E2E: login, CRM pipeline DnD, analytics dashboard, export CSV/XLSX
+- LSP live_diagnostics: 0 type errors
+- npx prisma validate: schema valid
+- npm run build: compile check
+
+## Development loop (MCP-first)
+1. Read PROJECT.md FIRST
+2. `mcp__lsp_intelligence__document_symbols` on files to modify — understand structure before editing
+3. Edit via `mcp__zenith__edit_file` or `write_file` — NEVER sed for code
+4. `mcp__lsp_intelligence__live_diagnostics` after edit — 0 errors
+5. Code review via `mcp__mcp_code_review_pro__review_diff` or `delegate_task`
+6. gitleaks on staged diff
+7. Update PROJECT.md before commit
+8. Commit via `mcp__github__push_files` — atomic conventional commit
+
 ## Boundaries 3-Tier (Always / Ask / Never)
 
 ### ✅ ALWAYS — Hacer sin preguntar
