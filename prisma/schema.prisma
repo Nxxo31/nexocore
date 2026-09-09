@@ -111,6 +111,17 @@ enum SubStatus {
   CANCELLED
 }
 
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  MOVE
+  LOGIN
+  LOGOUT
+  EXPORT
+  IMPORT
+}
+
 // ============================================================================
 // NÚCLEO MULTI-TENANT
 // ============================================================================
@@ -144,6 +155,7 @@ model Workspace {
   movements       InventoryMovement[]
   kpiSnapshots    KpiSnapshot[]
   alerts          Alert[]
+  auditLogs       AuditLog[]
   subscription    Subscription?
 }
 
@@ -521,6 +533,29 @@ model Alert {
 
   @@index([tenantId, isRead])
   @@index([tenantId, type])
+}
+
+// ============================================================================
+// MÓDULO AUDIT LOG
+// ============================================================================
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  tenantId    String
+  userId      String?
+  action      AuditAction
+  entity      String      // "Contact" | "Deal" | "Invoice" | etc.
+  entityId     String?
+  metadata    Json        @default("{}")
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime    @default(now())
+
+  workspace   Workspace   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, entity])
+  @@index([tenantId, action])
 }
 
 // ============================================================================

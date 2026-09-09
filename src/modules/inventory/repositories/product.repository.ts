@@ -36,11 +36,14 @@ export class ProductRepository extends TenantRepository<Product> {
   }
 
   async create(data: Record<string, unknown>): Promise<Product> {
-    return prisma.product.create({ data as Prisma.ProductCreateInput });
+    return prisma.product.create({ data: data as unknown as Prisma.ProductCreateInput });
   }
 
   async update(id: string, data: Record<string, unknown>): Promise<Product> {
-    return prisma.product.update({ where: { id }, data: data as Prisma.ProductUpdateInput });
+    return prisma.product.update({
+      where: { id },
+      data: data as unknown as Prisma.ProductUpdateInput,
+    });
   }
 
   async delete(id: string): Promise<void> {

@@ -69,7 +69,7 @@ export interface KpiDefinition {
 
 export interface AlertRule {
   key: string;
-  type: "STOCK_LOW" | "INVOICE_OVERDUE" | "DEAL_STALE" | "ORDER_DELAYED";
+  type: "STOCK_LOW" | "INVOICE_OVERDUE" | "DEAL_STALE" | "ORDER_DELAYED" | "KPI_ANOMALY";
   condition: string;
   severity: "INFO" | "WARNING" | "CRITICAL";
   title: string;
