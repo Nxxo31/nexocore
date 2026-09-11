@@ -7,3 +7,20 @@ node_modules/
 dist/
 build/
 prisma/migrations/dev.db*
+
+# Tooling artifacts (not for public repo)
+git_health.json
+reforge-state.json
+*.bak
+*.ts.bak
+*.ts.backup
+*.ts.bak2
+__pycache__/
+*.pyc
+.sprint/
+.codereview.yml
+
+# Next.js dev cache
+.turbo/
+.swc/
+
