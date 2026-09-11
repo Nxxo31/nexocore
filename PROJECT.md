@@ -1,6 +1,6 @@
 # NexoCore — Plataforma SaaS Multi-Tenant ERP/CRM/Analytics para PYMEs
-**Versión:** 2026.08.09 | **Sprint:** 1 (Semana 1) — Base y plantillas
-**Estado:** EN PROGRESO · Sprint 1 completo, Sprints 2-4 planificados
+**Versión:** 2026.09.11 | **Sprint:** 1 cerrado con blockers resueltos
+**Estado:** Alpha · Sprint 1 completo, blockers de auth/deps/migraciones resueltos, Sprints 2-4 planificados
 
 ## Resumen
 
@@ -8,7 +8,7 @@ Plataforma SaaS multi-tenant donde cada empresa (tenant) accede a un workspace
 configurado con una PLANTILLA DE NICHO que pre-configura módulos activos,
 campos de inventario, KPIs, pipeline CRM, formularios y terminología de UI.
 
-Stack: Next.js 15 App Router · TypeScript · PostgreSQL · Prisma ORM
+Stack: Next.js 16 App Router · TypeScript 5 · PostgreSQL · Prisma ORM
        Node.js · Stripe · Resend · BullMQ · Redis · shadcn/ui · Tailwind
 
 ## Plantillas de Nicho (7)
@@ -33,13 +33,13 @@ Cada requisito tiene un ID único (R-XX), descripción verificable, y estado obs
 
 | ID | Requisito | Verificación | Estado |
 |----|-----------|--------------|--------|
-| R-01 | Setup Next.js 15 + Prisma + TypeScript | `npx next build` exit 0 | ✅ Done |
+| R-01 | Setup Next.js 16 + Prisma + TypeScript | `npx next build` exit 0 | ✅ Done |
 | R-02 | schema.prisma completo (todas las tablas multi-tenant) | `npx prisma validate` exit 0 | ✅ Done |
 | R-03 | 7 plantillas de nicho en Template Factory | `grep -r "templateId" src/modules/templates/` 7 IDs | ✅ Done |
-| R-04 | NextAuth v5 multi-tenant con tenant_id en JWT | Login devuelve JWT con `tenant_id` claim | ✅ Done |
+| R-04 | NextAuth v5 multi-tenant con tenant_id en JWT + bcrypt verify | Login valida password con bcrypt.compare | ✅ Done |
 | R-05 | Middleware multi-tenant (subdominio + JWT) | Petición sin JWT → redirect /login | ✅ Done |
 | R-06 | Onboarding con selector de nicho | Flujo crea tenant + aplica plantilla | ✅ Done |
-| R-07 | Layout dashboard con sidebar dinámico según plantilla | Sidebar cambia según `templateId` | ✅ Done |
+| R-07 | Layout dashboard con sidebar dinámico según plantilla (industry desde JWT) | Sidebar cambia según `getTenantSession().industry` | ✅ Done |
 | R-08 | Repository Pattern con tenant isolation automático | Todo repository recibe `tenantId`, query filter | ✅ Done |
 | R-09 | RLS PostgreSQL por tenant_id | `SET app.tenant_id` → query ajenos retorna 0 filas | ✅ Done |
 | R-10 | Módulo Inventario: productos, proveedores, movimientos | CRUD completo + listado paginado | ✅ Done |
@@ -53,6 +53,15 @@ Cada requisito tiene un ID único (R-XX), descripción verificable, y estado obs
 | R-18 | Auditoría: log de acciones por tenant | Sprint 3 | ⏳ Pendiente |
 | R-19 | Exportación CSV/Excel de módulos | Sprint 3 | ⏳ Pendiente |
 | R-20 | Search global (productos, contacts, deals) | Sprint 4 | ⏳ Pendiente |
+
+## Cambios recientes (2026-09-11 — cierre Sprint 1)
+
+- `chore(cleanup): eliminar archivos .ts/.backup/.bak2 obsoletos de useWorkspace` (8081cf2)
+- `chore(deps): añadir dependencias faltantes (@dnd-kit/utilities, @valkey/valkey-glide, bcryptjs)` (a2fa830)
+- `fix(auth): implementar verificación real de bcrypt en authorize` (6160370) — **CRÍTICO**: cierra backdoor de auth abierto
+- `fix(dashboard): resolver TODOs multi-tenant — industry viene del JWT` (ef75c7c)
+- `chore(higiene): limpiar .gitignore y eliminar archivos de tooling stale` (7ee42f5)
+- `chore(prisma): generar baseline migration init para schema multi-tenant` (da90bb5)
 
 ## Roadmap
 
@@ -137,3 +146,4 @@ El DoD es un ESTADO, no una opinión. Si no puedes demostrarlo con un comando, n
 |-------|--------|--------|
 | 2026-08-07 | Sprint 1 kickoff | Setup proyecto, schema, plantillas, auth, middleware, onboarding, layout |
 | 2026-08-09 | Sprint 1 review | PROJECT.md mejorado (matriz R-XX, roadmap 2-4, DoD, out-of-scope, decisiones) + commit pendientes |
+| 2026-09-11 | Cierre Sprint 1 — blockers resueltos | 6 commits: cleanup useWorkspace stale, deps faltantes (@dnd-kit/utilities, @valkey/valkey-glide, bcryptjs), bcrypt real en authorize (cierra backdoor de auth), TODOs multi-tenant en dashboard resueltos con getTenantSession, .gitignore + tooling stale (git_health, reforge-state, queue.setup.ts.bak), prisma migrate baseline init |
