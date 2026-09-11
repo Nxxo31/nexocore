@@ -43,8 +43,11 @@ export default auth((req: NextRequest & { auth?: unknown }) => {
   // Protect dashboard routes — require auth
   if (pathname.startsWith("/dashboard") || pathname.startsWith("/api/")) {
     const session = req.auth;
-    // auth() returns session or null; if null, redirect to login
-    // NextAuth v5 handles this via the auth export
+    if (!session) {
+      const loginUrl = new URL("/login", req.url);
+      loginUrl.searchParams.set("callbackUrl", req.url);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   return NextResponse.next({
