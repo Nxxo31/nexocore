@@ -2,12 +2,11 @@
 // Resumen con KPIs del template activo
 
 import { TemplateFactory } from "@/modules/templates/templates";
-import type { Industry } from "@/modules/templates/template.types";
+import { getTenantSession } from "@/shared/auth/session";
 import { BarChart3, TrendingUp, Package, Users, FileText, AlertTriangle } from "lucide-react";
 
-export default function DashboardPage() {
-  // TODO: from session JWT
-  const industry: Industry = "FERRETERIA";
+export default async function DashboardPage() {
+  const { industry } = await getTenantSession();
   const template = TemplateFactory.create(industry);
 
   // Demo KPI values (Sprint 2-4 will replace with real data)

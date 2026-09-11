@@ -2,7 +2,7 @@
 // Sidebar dinámico según plantilla del workspace
 
 import { TemplateFactory } from "@/modules/templates/templates";
-import type { Industry } from "@/modules/templates/template.types";
+import { getTenantSession } from "@/shared/auth/session";
 import {
   LayoutDashboard,
   Package,
@@ -34,14 +34,12 @@ const ICONS: Record<string, LucideIcon> = {
   FolderKanban,
 };
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // TODO: get from session JWT in production
-  // For now uses a demo industry
-  const industry: Industry = "FERRETERIA";
+  const { industry } = await getTenantSession();
   const template = TemplateFactory.create(industry);
 
   const enabledNavItems = template.navItems.filter((item) => item.enabled);
