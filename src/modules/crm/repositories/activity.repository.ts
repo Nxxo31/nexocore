@@ -56,7 +56,7 @@ export class ActivityRepository extends TenantRepository<Activity> {
 
   async update(id: string, data: Record<string, unknown>): Promise<Activity> {
     return prisma.activity.update({
-      where: { id },
+      where: { id, tenantId: this.tenantId },
       data: data as unknown as Prisma.ActivityUpdateInput,
     });
   }

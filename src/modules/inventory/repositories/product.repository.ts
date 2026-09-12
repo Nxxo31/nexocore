@@ -14,15 +14,20 @@ export class ProductRepository extends TenantRepository<Product> {
   ): Promise<PaginatedResult<Product>> {
     const { cursor, take = 20, skip = 0 } = pagination;
 
+    const where: Prisma.ProductWhereInput = {
+      tenantId: this.tenantId,
+      ...filters,
+    };
+
     const [data, total] = await prisma.$transaction([
       prisma.product.findMany({
-        where: { ...filters },
+        where,
         take,
         skip,
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: { updatedAt: "desc" },
       }),
-      prisma.product.count({ where: { ...filters } }),
+      prisma.product.count({ where }),
     ]);
 
     const nextCursor =
@@ -32,22 +37,24 @@ export class ProductRepository extends TenantRepository<Product> {
   }
 
   async findById(id: string): Promise<Product | null> {
-    return prisma.product.findUnique({ where: { id } });
+    return prisma.product.findFirst({ where: { id, tenantId: this.tenantId } });
   }
 
   async create(data: Record<string, unknown>): Promise<Product> {
-    return prisma.product.create({ data: data as unknown as Prisma.ProductCreateInput });
+    return prisma.product.create({
+      data: { ...data, tenantId: this.tenantId } as unknown as Prisma.ProductCreateInput,
+    });
   }
 
   async update(id: string, data: Record<string, unknown>): Promise<Product> {
     return prisma.product.update({
-      where: { id },
+      where: { id, tenantId: this.tenantId },
       data: data as unknown as Prisma.ProductUpdateInput,
     });
   }
 
   async delete(id: string): Promise<void> {
-    await prisma.product.delete({ where: { id } });
+    await prisma.product.delete({ where: { id, tenantId: this.tenantId } });
   }
 
   // Métodos específicos de inventario

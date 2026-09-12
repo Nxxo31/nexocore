@@ -27,15 +27,21 @@ export async function getTenantSession(): Promise<SessionTenant> {
   const industry = session?.user?.industry as Industry | undefined;
 
   if (!tenantId || !industry) {
-    // Fallback de desarrollo: workspace demo con FERRETERIA.
-    // Esto permite que las páginas Server Component rendericen sin DB.
-    return {
-      tenantId: process.env.NEXOCORE_DEMO_TENANT_ID ?? "demo-tenant",
-      industry: "FERRETERIA",
-      userId: session?.user?.id ?? "demo-user",
-      role: session?.user?.role ?? "OWNER",
-      plan: session?.user?.plan ?? "STARTER",
-    };
+    // Development-only fallback: permite renderizar sin DB cuando NEXOCORE_DEV_FALLBACK=1.
+    // En producción NUNCA se cae a demo-tenant — se lanza error explícito para que el
+    // middleware redirija a /login y el problema sea visible.
+    if (process.env.NODE_ENV !== "production" && process.env.NEXOCORE_DEV_FALLBACK === "1") {
+      return {
+        tenantId: process.env.NEXOCORE_DEMO_TENANT_ID ?? "demo-tenant",
+        industry: "FERRETERIA",
+        userId: session?.user?.id ?? "demo-user",
+        role: session?.user?.role ?? "OWNER",
+        plan: session?.user?.plan ?? "STARTER",
+      };
+    }
+    throw new Error(
+      "getTenantSession: no authenticated session. User must sign in before accessing tenant-scoped routes."
+    );
   }
 
   return {

@@ -1,18 +1,20 @@
 import { NextResponse } from 'next/server';
 import { InvoiceJobProducer } from '@/modules/jobs/producer';
+import { getTenantSession } from '@/shared/auth/session';
 
 export async function POST(request: Request) {
   try {
-    const { tenantId, period } = await request.json();
+    const session = await getTenantSession();
+    const { period } = await request.json();
 
-    if (!tenantId || !period) {
+    if (!period) {
       return NextResponse.json(
-        { error: 'tenantId and period are required' },
+        { error: 'period is required' },
         { status: 400 }
       );
     }
 
-    await InvoiceJobProducer.addInvoiceGenerationJob(tenantId, period);
+    await InvoiceJobProducer.addInvoiceGenerationJob(session.tenantId, period);
 
     return NextResponse.json(
       { message: 'Invoice generation job queued successfully' },

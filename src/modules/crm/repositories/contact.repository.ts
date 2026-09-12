@@ -58,7 +58,7 @@ export class ContactRepository extends TenantRepository<Contact> {
 
   async update(id: string, data: Record<string, unknown>): Promise<Contact> {
     return prisma.contact.update({
-      where: { id },
+      where: { id, tenantId: this.tenantId },
       data: data as unknown as Prisma.ContactUpdateInput,
     });
   }

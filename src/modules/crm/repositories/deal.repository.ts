@@ -65,7 +65,7 @@ export class DealRepository extends TenantRepository<Deal> {
 
   async update(id: string, data: Record<string, unknown>): Promise<Deal> {
     return prisma.deal.update({
-      where: { id },
+      where: { id, tenantId: this.tenantId },
       data: data as unknown as Prisma.DealUpdateInput,
     });
   }

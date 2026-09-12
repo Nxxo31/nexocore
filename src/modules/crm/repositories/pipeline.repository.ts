@@ -56,7 +56,7 @@ export class PipelineStageRepository extends TenantRepository<PipelineStage> {
 
   async update(id: string, data: Record<string, unknown>): Promise<PipelineStage> {
     return prisma.pipelineStage.update({
-      where: { id },
+      where: { id, tenantId: this.tenantId },
       data: data as unknown as Prisma.PipelineStageUpdateInput,
     });
   }
