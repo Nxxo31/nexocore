@@ -78,17 +78,34 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       }
 
-      // Allow session update to switch workspace
-      if (trigger === "update" && session?.tenantId) {
-        const ws = await prisma.workspace.findUnique({
-          where: { id: session.tenantId },
+      // Allow session update to switch workspace — verify ownership before applying
+      if (trigger === "update" && session?.tenantId && token.uid) {
+        const requestedTenantId = session.tenantId;
+
+        // Verify the current user is a member of the requested workspace
+        const membership = await prisma.workspaceUser.findUnique({
+          where: {
+            workspaceId_userId: {
+              workspaceId: requestedTenantId,
+              userId: token.uid as string,
+            },
+          },
+          include: { workspace: true },
         });
-        if (ws) {
-          token.tenantId = ws.id;
-          token.tenantSlug = ws.slug;
-          token.industry = ws.industry;
-          token.plan = ws.plan;
+
+        if (!membership) {
+          console.warn(
+            `[auth] rejected workspace switch: user ${token.uid} is not a member of workspace ${requestedTenantId}`,
+          );
+          return token;
         }
+
+        const ws = membership.workspace;
+        token.tenantId = ws.id;
+        token.tenantSlug = ws.slug;
+        token.industry = ws.industry;
+        token.plan = ws.plan;
+        token.role = membership.role;
       }
 
       return token;
