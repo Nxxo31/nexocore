@@ -1,6 +1,6 @@
 import { Html, Head, Body, Section, Heading, Text, Button, Preview } from '@react-email/components';
 
-export const WelcomeEmail = ({ userName, tenantName }: { userName: string; tenantName: string }) => {
+export const WelcomeEmail = ({ userName, tenantName, loginUrl }: { userName: string; tenantName: string; loginUrl: string }) => {
   return (
     <>
       <Preview>Bienvenido a {tenantName}</Preview>
@@ -13,7 +13,7 @@ export const WelcomeEmail = ({ userName, tenantName }: { userName: string; tenan
             <Text>
               Estamos emocionados de que te hayas unido a {tenantName}. Tu cuenta ha sido creada exitosamente.
             </Text>
-            <Button href="#" style={{ backgroundColor: '#2563eb', color: '#ffffff', padding: '12px 24px', borderRadius: '4px', textDecoration: 'none' }}>
+            <Button href={loginUrl} style={{ backgroundColor: '#2563eb', color: '#ffffff', padding: '12px 24px', borderRadius: '4px', textDecoration: 'none' }}>
               Iniciar sesión
             </Button>
             <Text style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>

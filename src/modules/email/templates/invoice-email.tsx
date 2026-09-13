@@ -1,6 +1,6 @@
 import { Html, Head, Body, Section, Heading, Text, Button, Preview } from '@react-email/components';
 
-export const InvoiceEmail = ({ invoiceNumber, amount, dueDate, tenantName }: { invoiceNumber: string; amount: number; dueDate: string; tenantName: string }) => {
+export const InvoiceEmail = ({ invoiceNumber, amount, dueDate, tenantName, invoiceUrl }: { invoiceNumber: string; amount: number; dueDate: string; tenantName: string; invoiceUrl: string }) => {
   return (
     <>
       <Preview>Factura {invoiceNumber} - {tenantName}</Preview>
@@ -13,7 +13,7 @@ export const InvoiceEmail = ({ invoiceNumber, amount, dueDate, tenantName }: { i
             <Text>
               Adjuntamos la factura {invoiceNumber} por un monto de ${amount.toFixed(2)} con vencimiento el {dueDate}.
             </Text>
-            <Button href="#" style={{ backgroundColor: '#2563eb', color: '#ffffff', padding: '12px 24px', borderRadius: '4px', textDecoration: 'none' }}>
+            <Button href={invoiceUrl} style={{ backgroundColor: '#2563eb', color: '#ffffff', padding: '12px 24px', borderRadius: '4px', textDecoration: 'none' }}>
               Ver factura
             </Button>
             <Text style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>

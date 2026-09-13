@@ -11,7 +11,7 @@ import { PositionAlertEmail } from '@/modules/email/templates/position-alert-ema
 // Initialize Resend with API key from environment
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const DEFAULT_FROM = `NexoCore <no-reply@${process.env.DOMAIN ?? 'nexocore.app'}>`;
+const DEFAULT_FROM = `NexoCore <no-reply@${process.env.DOMAIN ?? 'nexocore.co'}>`;
 
 export class EmailService {
   /**
@@ -19,11 +19,12 @@ export class EmailService {
    */
   static async sendWelcomeEmail(to: string, userName: string, tenantName: string): Promise<void> {
     try {
+      const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/login`;
       await resend.emails.send({
         from: DEFAULT_FROM,
         to,
         subject: `Bienvenido a ${tenantName} en NexoCore`,
-        react: WelcomeEmail({ userName, tenantName }),
+        react: WelcomeEmail({ userName, tenantName, loginUrl }),
       });
     } catch (error) {
       console.error('[EmailService] Error sending welcome email:', error);
@@ -54,11 +55,12 @@ export class EmailService {
    */
   static async sendInvoiceEmail(to: string, invoiceNumber: string, amount: number, dueDate: string, tenantName: string): Promise<void> {
     try {
+      const invoiceUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/dashboard/invoices/${invoiceNumber}`;
       await resend.emails.send({
         from: DEFAULT_FROM,
         to,
         subject: `Factura ${invoiceNumber} - ${tenantName}`,
-        react: InvoiceEmail({ invoiceNumber, amount, dueDate, tenantName }),
+        react: InvoiceEmail({ invoiceNumber, amount, dueDate, tenantName, invoiceUrl }),
       });
     } catch (error) {
       console.error('[EmailService] Error sending invoice email:', error);
