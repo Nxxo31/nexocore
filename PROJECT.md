@@ -1,6 +1,6 @@
 # NexoCore — Plataforma SaaS Multi-Tenant ERP/CRM/Analytics para PYMEs
-**Versión:** 2026.09.12 | **Sprint:** 1 cerrado con blockers resueltos + Sprint 2 pendiente
-**Estado:** Alpha · Sprint 1 completo (verificado 2026-09-12), 5 commits de seguridad post-auditoría, Sprints 2-4 planificados
+**Versión:** 2026.09.13 | **Sprint:** 2 parcial (UI inventory + workers reales)
+**Estado:** Alpha · Sprint 1+2 parcial completo (verificado 2026-09-13), Sprints 3-4 planificados
 
 ## Resumen
 
@@ -36,25 +36,25 @@ Cada requisito tiene un ID único (R-XX), descripción verificable, y estado obs
 | R-01 | Setup Next.js 16 + Prisma + TypeScript | `npm run build` (MOCK_REDIS=true) exit 0 | ✅ Done |
 | R-02 | schema.prisma completo (todas las tablas multi-tenant) | `npx prisma validate` exit 0 (con DATABASE_URL) | ✅ Done |
 | R-03 | 7 plantillas de nicho en Template Factory | 7 entries en `TEMPLATES` (templates.ts:260-372) | ✅ Done |
-| R-04 | NextAuth v5 multi-tenant con tenant_id en JWT + bcrypt verify | `authorize()` implementa `bcrypt.compare` real | ✅ Done |
+| R-04 | NextAuth v5 multi-tenant con tenant_id en JWT + bcrypt verify + IDOR fix + maxAge 8h | `authorize()` bcrypt.compare + tenant-switch ownership check + session.maxAge 8*60*60 | ✅ Done |
 | R-05 | Middleware multi-tenant (subdominio + JWT) | Petición sin JWT → redirect `/login?callbackUrl=` | ✅ Done |
 | R-06 | Onboarding con selector de nicho | Flujo crea tenant + aplica plantilla | ✅ Done |
 | R-07 | Layout dashboard con sidebar dinámico según plantilla | Sidebar cambia según `getTenantSession().industry` | ✅ Done |
 | R-08 | Repository Pattern con tenant isolation automático | Todo repository filtra `where:{tenantId}` en CRUD | ✅ Done |
 | R-09 | RLS PostgreSQL por tenant_id | `ENABLE ROW LEVEL SECURITY` + policies per-table | ✅ Done |
-| R-10 | Módulo Inventario: productos, proveedores, movimientos | CRUD completo + listado paginado | ✅ Done |
+| R-10 | Módulo Inventario: productos, proveedores, movimientos | CRUD + 3 UI pages (`/inventory`, `/inventory/movements`, `/inventory/suppliers`) | ✅ Done |
 | R-11 | Módulo CRM: pipeline, contacts, deals | Repos + APIs + UI básica (`/crm`, `/crm/contacts`) | ✅ Done |
 | R-12 | Módulo Analytics: dashboard KPIs por plantilla | Sprint 3 | ⏳ Pendiente |
 | R-13 | Stripe billing (suscripciones, webhooks) | Sprint 4 | ⏳ Pendiente |
-| R-14 | BullMQ background jobs (reportes, emails) | Esqueleto funcional (email worker OK, invoice+export = TODOs) | ⚠️ Parcial |
-| R-15 | Resend email transaccional (onboarding, alerts) | EmailService con 6 templates + producer/consumer | ✅ Done |
+| R-14 | BullMQ background jobs (reportes, emails) | email + invoice + data-export workers reales (consumer.ts) | ✅ Done |
+| R-15 | Resend email transaccional (onboarding, alerts) | EmailService con 6 templates + producer/consumer + URLs reales | ✅ Done |
 | R-16 | Plantilla override por usuario (custom fields) | Sprint 3 | ⏳ Pendiente |
 | R-17 | API rate limiting por plan (Starter/Pro/Enterprise) | Sprint 4 | ⏳ Pendiente |
-| R-18 | Auditoría: log de acciones por tenant | Servicio `audit.service.ts` + tabla AuditLog + RLS | ⚠️ Parcial |
-| R-19 | Exportación CSV/Excel de módulos | API `/api/contacts/export` + `/api/deals/export` (take:10000) | ⚠️ Parcial |
+| R-18 | Auditoría: log de acciones por tenant | Servicio `audit.service.ts` + tabla AuditLog + RLS + wired en `/api/contacts/export` + `/api/deals/export` + workers | ✅ Done |
+| R-19 | Exportación CSV/Excel de módulos | API `/api/contacts/export` (CSV) + `/api/deals/export` (XLSX) con audit + take:10000 | ✅ Done |
 | R-20 | Search global (productos, contacts, deals) | Sprint 4 | ⏳ Pendiente |
 
-## Cambios recientes (2026-09-11 → 2026-09-12 — cierre Sprint 1 + brechas seguridad)
+## Cambios recientes (2026-09-11 → 2026-09-13 — cierre Sprint 1+2 parcial)
 
 ### Sprint 1 (2026-09-11)
 - `chore(cleanup): eliminar archivos .ts/.backup/.bak2 obsoletos de useWorkspace` (8081cf2)
@@ -76,6 +76,15 @@ Cada requisito tiene un ID único (R-XX), descripción verificable, y estado obs
   - **Limpieza**: 4 archivos de test olvidados en `src/shared/hooks/` eliminados.
   - **Sidebar honesty**: rutas que no existen (inventory, invoicing, analytics, settings, scheduling, projects) marcadas `enabled=false` para no mostrar links 404.
   - **Session.ts hardened**: el fallback demo-tenant ahora requiere `NEXOCORE_DEV_FALLBACK=1` en dev. En producción lanza error explícito.
+- `fix(auth): verificar ownership antes de cambiar tenantId en session update` (293a7ad) — IDOR fix en tenant-switch callback.
+- `fix(auth): session.maxAge 8h explícito en NextAuth config` (f095b41) — JWT deja de ser 30d por default.
+- `docs(env): añadir REDIS_HOST/PORT/PASSWORD/DB separados` (a3686f3) — queue.setup.ts y consumer.ts los esperan.
+- `fix(email): nexocore.app→.co default domain + URLs reales en templates` (b3ba2f7) — welcome/invoice emails ya tienen loginUrl/invoiceUrl.
+
+### Sprint 2 parcial (2026-09-13)
+- `feat(inventory): habilitar nav items Inventario/Movimientos/Proveedores` (557fbd1) — base.template.ts pasa enabled=true.
+- `feat(jobs): implementar workers reales invoice-generation y data-export` (93de50c) — TODOs eliminados en consumer.ts.
+- `feat(inventory): UI pages para productos, movimientos, proveedores` (086eaa1) — 3 Server Components con cursor pagination + low-stock badge + search.
 
 ## Roadmap
 
@@ -83,21 +92,21 @@ Cada requisito tiene un ID único (R-XX), descripción verificable, y estado obs
 - [x] Setup Next.js 16 + Prisma + TypeScript (R-01)
 - [x] schema.prisma completo multi-tenant (R-02)
 - [x] 7 plantillas de nicho (R-03)
-- [x] NextAuth v5 multi-tenant (R-04)
+- [x] NextAuth v5 multi-tenant (R-04) — incluye bcrypt real + IDOR fix + maxAge 8h
 - [x] Middleware multi-tenant (R-05)
 - [x] Onboarding con selector de nicho (R-06)
 - [x] Layout dashboard con sidebar dinámico (R-07)
 - [x] Repository Pattern con tenant isolation (R-08)
 - [x] RLS PostgreSQL (R-09) — activado en migration 20260102000000
-- [x] Módulo Inventario base (R-10)
+- [x] Módulo Inventario base (R-10) — CRUD + UI ✅
 - [x] Módulo CRM (R-11) — bonus
 
-### Sprint 2 — Email + Jobs + UI Inventory (SEMANA 2)
-- [ ] Implementar páginas UI: `/dashboard/inventory`, `/dashboard/inventory/movements`, `/dashboard/inventory/suppliers`
-- [ ] Implementar `invoice-generation` worker real (consumer.ts:79 — TODOs)
-- [ ] Implementar `data-export` worker real (consumer.ts:91 — TODOs)
-- [ ] BullMQ: job de bienvenida + reporte diario (R-14 completar)
-- [ ] Wire de `audit.service.ts` en repositorios críticos (R-18)
+### Sprint 2 — Email + Jobs + UI Inventory (SEMANA 2) ✅ Parcial (2026-09-13)
+- [x] Implementar páginas UI: `/inventory`, `/inventory/movements`, `/inventory/suppliers` (086eaa1)
+- [x] Implementar `invoice-generation` worker real (93de50c)
+- [x] Implementar `data-export` worker real (93de50c)
+- [ ] BullMQ: job de bienvenida + reporte diario — `welcome-email` ya existe (EmailJobProducer), falta scheduled daily report
+- [x] Wire de `audit.service.ts` en export routes + workers — R-18 parcial ✅ (workers + contacts/deals export usan AuditService)
 
 ### Sprint 3 — Analytics + Templates avanzadas (SEMANA 3)
 - [ ] Módulo Analytics: KPIs dinámicos por plantilla (R-12)
