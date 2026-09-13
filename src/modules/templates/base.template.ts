@@ -14,9 +14,9 @@ export const BASE_MODULES: ModuleConfig = {
 
 export const BASE_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard", enabled: true },
-  { label: "Inventario", href: "/dashboard/inventory", icon: "Package", enabled: false },
-  { label: "Movimientos", href: "/dashboard/inventory/movements", icon: "ArrowLeftRight", enabled: false },
-  { label: "Proveedores", href: "/dashboard/inventory/suppliers", icon: "Truck", enabled: false },
+  { label: "Inventario", href: "/dashboard/inventory", icon: "Package", enabled: true },
+  { label: "Movimientos", href: "/dashboard/inventory/movements", icon: "ArrowLeftRight", enabled: true },
+  { label: "Proveedores", href: "/dashboard/inventory/suppliers", icon: "Truck", enabled: true },
   { label: "CRM", href: "/crm", icon: "Users", enabled: true },
   { label: "Contactos", href: "/crm/contacts", icon: "Contact", enabled: true },
   { label: "Facturación", href: "/dashboard/invoicing", icon: "FileText", enabled: false },
